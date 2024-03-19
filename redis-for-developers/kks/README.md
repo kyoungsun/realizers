@@ -224,8 +224,15 @@ OK
 
 * 정렬되지 않은 문자열의 모음
 * 하나의 set 내에서 아이템은 중복해서 저장되지 않음
+* SADD, SREM, SPOP 명령어는 O(1)의 시간복잡도를 갖지만 SMEMBERS는 O(n)의 시간복잡도를 가지고 있어서 사용 시 주의해야함
+  * SSCAN 명령어 사용을 고려할 것
+* 메모리 사용량이 걱정될 때는 Bloom filter 또는 Cuckoo filter 사용을 고려할 것
 
 ![](./images/data-structures-_sets.svg)
+
+#### Bloom filter
+
+레디스의 Bloom Filter는 확률적인 멤버십 질의를 위한 데이터 구조로, 고정된 크기의 비트 배열과 해시 함수를 사용하여 요소의 존재 여부를 빠르게 확인합니다. 이는 대량의 데이터에서 소량의 데이터를 빠르게 검색하는 데 유용하며, False Positive의 가능성이 있지만 False Negative는 발생하지 않습니다.
 
 ### 기본 명령어
 
@@ -308,7 +315,133 @@ OK
 
 ## Sorted sets
 
+* 스코어(score) 값에 따라 정렬되는 고유한 문자열의 집합
+* 모든 아이템은 스코어-값 쌍을 가지며, 저장될 때부터 스코어 값으로 정렬돼 저장됨
+* 같은 스코어 값을 가진 아이템은 데이터의 사전 순으로 정렬돼 저장됨
+* list처럼 인데스를 이용해 각 아이템에 접근할 수 있음
+* 사용자 랭킹을 저장할 때 많이 사용됨
+
+![](./images/data-structures-_sorted-sets.svg)
+
+### 기본 명령어
+
+* **ZADD** - 데이터 저장, 스코어-값 쌍으로 입력해야함
+  * 저장하려는 데이터가 이미 포함되어 있으면 스코어만 업데이트되며, 업데이트 된 스코어에 의해 아이템이 재정렬됨
+  * 지정한 키가 존재하지 않을 때 자료 구조를 새로 생성
+  * 키가 이미 존재하지만 sorted set이 아닐 경우 오류를 반환
+  * 스코어는 배정밀도 부동소수점 숫자(double precision floating point number)를 문자열로 표현한 값이어야함
+  * **XX 옵션**: 아이템이 이미 존재할 때에만 스코어를 업데이트
+  * **NX 옵션**: 아이템이 존재하지 않을 때에만 신규 삽입, 기존 아이템의 스코어를 업데이트하지 않음
+  * **LT 옵션**: 업데이트하고자 하는 스코어가 기존 아이템의 스코어보다 작을 때에만 업데이트, 기존 아이템이 없을 때는 새로운 데이터를 삽입
+  * **GT 옵션**: 업데이트하고자 하는 스코어가 기존 아이템의 스코어보다 클 때에만 업데이트, 기존 아이템이 없을 때는 새로운 데이터를 삽입
+* **ZRANGE** - 데이터 조회
+  * **WITHSCORE 옵션**: 데이터와 스코어 값이 차례대로 출력
+  * **REV 옵션**: 데이터는 역순으로 출력
+  * **BYSCORE 옵션** : 스코어를 이용해 데이터를 조회, 최소, 최대 스코어를 전달하며 전달한 스코어를 포함한 값을 조회
+    * `(` 문자를 추가하면 해당 스코어를 포함하지 않는 값만 조회할 수 있음
+    * **-inf, +inf**: infinity
+  * **BYLEX 옵션**: 사전식 순서을 이용해 특정 아이템을 조회
+    * `(`: 입력한 문자열을 포함
+    * `[`: 입력한 문자열을 포함하지 않음
+    * 문자열은 ASCII 바이트 값에 따라 사전식으로 정렬
+
+```shell
+127.0.0.1:6379> ZADD score:220817 100 user:B
+(integer) 1
+
+127.0.0.1:6379> ZADD score:220817 150 user:A 150 user:C 200 user:F 300 user:E
+
+### 인덱스로 데이터 조회
+127.0.0.1:6379> ZRANGE score:220817 1 3
+1) "user:A"
+2) "user:C"
+3) "user:F"
+
+127.0.0.1:6379> ZRANGE score:220817 1 3 WITHSCORES
+1) "user:A"
+2) "150"
+3) "user:C"
+4) "150"
+5) "user:F"
+6) "200"
+
+127.0.0.1:6379> ZRANGE score:220817 1 3 WITHSCORES REV
+1) "user:F"
+2) "200"
+3) "user:C"
+4) "150"
+5) "user:A"
+6) "150"
+
+127.0.0.1:6379> ZRANGE score:220817 0 -1
+1) "user:B"
+2) "user:A"
+3) "user:C"
+4) "user:F"
+5) "user:E"
+(integer) 4
+
+### 스코어로 데이터 조회
+127.0.0.1:6379> ZRANGE score:220817 100 200 BYSCORE WITHSCORES
+1) "user:B"
+2) "100"
+3) "user:A"
+4) "150"
+5) "user:C"
+6) "150"
+7) "user:F"
+8) "200"
+
+127.0.0.1:6379> ZRANGE score:220817 (100 200 BYSCORE WITHSCORES
+1) "user:A"
+2) "150"
+3) "user:C"
+4) "150"
+5) "user:F"
+6) "200"
+
+127.0.0.1:6379> ZRANGE score:220817 100 (200 BYSCORE WITHSCORES
+1) "user:B"
+2) "100"
+3) "user:A"
+4) "150"
+5) "user:C"
+6) "150"
+
+127.0.0.1:6379> ZRANGE score:220817 (100 (200 BYSCORE WITHSCORES
+1) "user:A"
+2) "150"
+3) "user:C"
+4) "150"
+
+### 사전 순으로 데이터 조회
+127.0.0.1:6379> ZADD mysortedset 0 apple 0 banana 0 candy 0 dream 0 egg 0 frog
+(integer) 6
+
+# stop의 문자열은 포함 안됨
+127.0.0.1:6379> ZRANGE mysortedset (b (f BYLEX
+1) "banana"
+2) "candy"
+3) "dream"
+4) "egg"
+
+127.0.0.1:6379> ZRANGE mysortedset (b [e BYLEX
+1) "banana"
+2) "candy"
+3) "dream"
+
+127.0.0.1:6379> ZRANGE mysortedset - + BYLEX
+1) "apple"
+2) "banana"
+3) "candy"
+4) "dream"
+5) "egg"
+6) "frog"
+```
+
 ## Bitmaps
+
+
 
 ## Bitfields
 
