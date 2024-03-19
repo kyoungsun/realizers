@@ -59,8 +59,11 @@ OK
 
 * 순서를 가지는 문자열의 목록
 * 하나의 list에는 최대 42억여 개의 아이템을 저장할 수 있음
-* 인덱스를 이용해 데이터에 직접 접근할 수 있고, 일반적으로 스택과 큐로서 사용됨
-  
+* Linked Lists를 통해 구현되어 있어 있어 리스트 맨 앞이나 맨 뒤에 아이템을 추가할 때는 일정한 시간으로 수행됨
+* 인덱스를 이용해 데이터에 직접 접근할 수 있지만 속도가 느림
+  * 큰 집합에서 중간 값에 빠른 접근이 필요할 때는 Sorted sets을 사용할 것
+* 
+
 ![](./images/data-structures-_lists.svg)
 
 ### 기본 명령어
@@ -177,6 +180,7 @@ OK
 ## Hashes
 
 * 필드-값 쌍을 가진 아이템의 집합
+  * 하나의 hash는 4,294,967,295개의 필드-값 쌍을 가질 수 있음
 * 필드는 하나의 hash 내에서 유일하며, 필드와 값 모두 문자열 데이터로 저장됨
 * 각 아이템마다 다른 필드를 가질 수 있으며, 동적으로 다양한 필드를 추가할 수 있음
 
@@ -218,6 +222,90 @@ OK
 
 ## Sets
 
+* 정렬되지 않은 문자열의 모음
+* 하나의 set 내에서 아이템은 중복해서 저장되지 않음
+
+![](./images/data-structures-_sets.svg)
+
+### 기본 명령어
+
+* **SADD** - 데이터 저장, 한 번에 여러 개의 아이템을 저장할 수 있음
+* **SMEMBERS** - set에 저장된 전체 아이템을 출력, 저장 순서와 관계 없음
+* **SREM** - 특정 아이템을 삭제
+* **SPOP** - 아이템을 랜덤으로 하나 반환하고 set에서 삭제
+* **SINTER** - set에서 아이템들의 교집합
+* **SUNION** - 합집합
+* **SDIFF** - 차집합
+
+```shell
+127.0.0.1:6379> SADD myset A
+(integer) 1
+
+127.0.0.1:6379> SADD myset A A A B B C D D E E F F F G
+(integer) 6
+
+127.0.0.1:6379> SMEMBERS myset
+1) "A"
+2) "B"
+3) "C"
+4) "D"
+5) "E"
+6) "F"
+7) "G"
+
+### SREM, SPOP
+127.0.0.1:6379> SREM myset B
+(integer) 1
+
+127.0.0.1:6379> SPOP myset
+"C"
+
+127.0.0.1:6379> SMEMBERS myset
+1) "A"
+2) "D"
+3) "E"
+4) "F"
+5) "G"
+
+### SINTER, SUNION, SDIFF
+127.0.0.1:6379> SADD set:111 A B C D E
+(integer) 5
+
+127.0.0.1:6379> SADD set:222 D E F G H
+(integer) 5
+
+127.0.0.1:6379> SINTER set:111 set:222
+1) "D"
+2) "E"
+
+127.0.0.1:6379> SUNION set:111 set:222
+1) "A"
+2) "B"
+3) "C"
+4) "D"
+5) "E"
+6) "F"
+7) "G"
+8) "H"
+
+127.0.0.1:6379> SDIFF set:111 set:222
+1) "A"
+2) "B"
+3) "C"
+
+127.0.0.1:6379> SDIFF set:222 set:111
+1) "F"
+2) "G"
+3) "H"
+
+127.0.0.1:6379> SADD set:333 G
+(integer) 1
+
+127.0.0.1:6379> SDIFF set:222 set:111 set:333
+1) "F"
+2) "H"
+```
+
 ## Sorted sets
 
 ## Bitmaps
@@ -239,4 +327,5 @@ OK
 **참고 자료**
 
 * [이미지 출처](https://redis.com/redis-enterprise/data-structures/)
+* [takes the latest tweets](https://www.infoq.com/presentations/Real-Time-Delivery-Twitter)
 * [유저 목록을 Redis Bitmap 구조로 저장하여 메모리 절약하기](https://blog.dramancompany.com/2022/10/%EC%9C%A0%EC%A0%80-%EB%AA%A9%EB%A1%9D%EC%9D%84-redis-bitmap-%EA%B5%AC%EC%A1%B0%EB%A1%9C-%EC%A0%80%EC%9E%A5%ED%95%98%EC%97%AC-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EC%A0%88%EC%95%BD%ED%95%98%EA%B8%B0/)
