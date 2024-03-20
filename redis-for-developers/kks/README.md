@@ -28,28 +28,28 @@
 * **MGET** - 한 번에 여러 키를 조회
 
 ```shell
-127.0.0.1:6379> set hello world
+> set hello world
 OK
 
-127.0.0.1:6379> get hello
+> get hello
 "world"
 
-127.0.0.1:6379> set hello newval NX
+> set hello newval NX
 (nil)
 
-127.0.0.1:6379> get hello
+> get hello
 "world"
 
-127.0.0.1:6379> set hi newval2 XX
+> set hi newval2 XX
 (nil)
 
-127.0.0.1:6379> get hi
+> get hi
 (nil)
 
-127.0.0.1:6379> mset a 10 b 20 c 30
+> mset a 10 b 20 c 30
 OK
 
-127.0.0.1:6379> mget a b c
+> mget a b c
 1) "10"
 2) "20"
 3) "30"
@@ -84,16 +84,16 @@ OK
 * **LINDEX** - 원하는 인덱스의 데이터를 확인
 
 ```shell
-127.0.0.1:6379> LPUSH mylist E
+> LPUSH mylist E
 (integer) 1
 
-127.0.0.1:6379> RPUSH mylist B
+> RPUSH mylist B
 (integer) 2
 
-127.0.0.1:6379> LPUSH mylist D A C B A
+> LPUSH mylist D A C B A
 (integer) 7
 
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "A"
 2) "B"
 3) "C"
@@ -102,45 +102,45 @@ OK
 6) "E"
 7) "B"
 
-127.0.0.1:6379> LRANGE mylist 0 3
+> LRANGE mylist 0 3
 1) "A"
 2) "B"
 3) "C"
 4) "A"
 
 ### LPOP
-127.0.0.1:6379> LPOP mylist
+> LPOP mylist
 "A"
 
-127.0.0.1:6379> LPOP mylist 3
+> LPOP mylist 3
 1) "B"
 2) "C"
 3) "A"
 
 ### LTRIM
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "D"
 2) "E"
 3) "B"
 
-127.0.0.1:6379> LTRIM mylist 0 1
+> LTRIM mylist 0 1
 OK
 
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "D"
 2) "E"
 
 ### LINSERT
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "C"
 2) "A"
 3) "D"
 4) "E"
 
-127.0.0.1:6379> LINSERT mylist BEFORE A B
+> LINSERT mylist BEFORE A B
 (integer) 5
 
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "C"
 2) "B"
 3) "A"
@@ -148,17 +148,17 @@ OK
 5) "E"
 
 ### LSET
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "C"
 2) "B"
 3) "A"
 4) "D"
 5) "E"
 
-127.0.0.1:6379> LSET mylist 0 F
+> LSET mylist 0 F
 OK
 
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "F"
 2) "B"
 3) "A"
@@ -166,14 +166,14 @@ OK
 5) "E"
 
 ### LINDEX
-127.0.0.1:6379> LRANGE mylist 0 -1
+> LRANGE mylist 0 -1
 1) "F"
 2) "B"
 3) "A"
 4) "D"
 5) "E"
 
-127.0.0.1:6379> LINDEX mylist 3
+> LINDEX mylist 3
 "D"
 ```
 
@@ -194,26 +194,26 @@ OK
 * **HGETALL** - 하나의 hash 내의 모든 필드-값 쌍을 차례로 반환
 
 ```shell
-127.0.0.1:6379> HSET Product:123 Name "Happy Hacking"
+> HSET Product:123 Name "Happy Hacking"
 (integer) 1
 
-127.0.0.1:6379> HSET Product:123 TypeID 35
+> HSET Product:123 TypeID 35
 (integer) 1
 
-127.0.0.1:6379> HSET Product:123 Version 2022
+> HSET Product:123 Version 2022
 (integer) 1
 
-127.0.0.1:6379> HSET Product:234 Name "Track Ball" TypeID 32
+> HSET Product:234 Name "Track Ball" TypeID 32
 (integer) 2
 
-127.0.0.1:6379> HGET Product:123 TypeID
+> HGET Product:123 TypeID
 "35"
 
-127.0.0.1:6379> HMGET Product:234 Name TypeID 
+> HMGET Product:234 Name TypeID 
 1) "Track Ball"
 2) "32"
 
-127.0.0.1:6379> HGETALL Product:234
+> HGETALL Product:234
 1) "Name"
 2) "Track Ball"
 3) "TypeID"
@@ -243,15 +243,16 @@ OK
 * **SINTER** - set에서 아이템들의 교집합
 * **SUNION** - 합집합
 * **SDIFF** - 차집합
+* **SCARD** - 특정 키에 저장된 데이터의 개수를 반환
 
 ```shell
-127.0.0.1:6379> SADD myset A
+> SADD myset A
 (integer) 1
 
-127.0.0.1:6379> SADD myset A A A B B C D D E E F F F G
+> SADD myset A A A B B C D D E E F F F G
 (integer) 6
 
-127.0.0.1:6379> SMEMBERS myset
+> SMEMBERS myset
 1) "A"
 2) "B"
 3) "C"
@@ -261,13 +262,13 @@ OK
 7) "G"
 
 ### SREM, SPOP
-127.0.0.1:6379> SREM myset B
+> SREM myset B
 (integer) 1
 
-127.0.0.1:6379> SPOP myset
+> SPOP myset
 "C"
 
-127.0.0.1:6379> SMEMBERS myset
+> SMEMBERS myset
 1) "A"
 2) "D"
 3) "E"
@@ -275,17 +276,17 @@ OK
 5) "G"
 
 ### SINTER, SUNION, SDIFF
-127.0.0.1:6379> SADD set:111 A B C D E
+> SADD set:111 A B C D E
 (integer) 5
 
-127.0.0.1:6379> SADD set:222 D E F G H
+> SADD set:222 D E F G H
 (integer) 5
 
-127.0.0.1:6379> SINTER set:111 set:222
+> SINTER set:111 set:222
 1) "D"
 2) "E"
 
-127.0.0.1:6379> SUNION set:111 set:222
+> SUNION set:111 set:222
 1) "A"
 2) "B"
 3) "C"
@@ -295,20 +296,20 @@ OK
 7) "G"
 8) "H"
 
-127.0.0.1:6379> SDIFF set:111 set:222
+> SDIFF set:111 set:222
 1) "A"
 2) "B"
 3) "C"
 
-127.0.0.1:6379> SDIFF set:222 set:111
+> SDIFF set:222 set:111
 1) "F"
 2) "G"
 3) "H"
 
-127.0.0.1:6379> SADD set:333 G
+> SADD set:333 G
 (integer) 1
 
-127.0.0.1:6379> SDIFF set:222 set:111 set:333
+> SDIFF set:222 set:111 set:333
 1) "F"
 2) "H"
 ```
@@ -346,18 +347,18 @@ OK
     * 문자열은 ASCII 바이트 값에 따라 사전식으로 정렬
 
 ```shell
-127.0.0.1:6379> ZADD score:220817 100 user:B
+> ZADD score:220817 100 user:B
 (integer) 1
 
-127.0.0.1:6379> ZADD score:220817 150 user:A 150 user:C 200 user:F 300 user:E
+> ZADD score:220817 150 user:A 150 user:C 200 user:F 300 user:E
 
 ### 인덱스로 데이터 조회
-127.0.0.1:6379> ZRANGE score:220817 1 3
+> ZRANGE score:220817 1 3
 1) "user:A"
 2) "user:C"
 3) "user:F"
 
-127.0.0.1:6379> ZRANGE score:220817 1 3 WITHSCORES
+> ZRANGE score:220817 1 3 WITHSCORES
 1) "user:A"
 2) "150"
 3) "user:C"
@@ -365,7 +366,7 @@ OK
 5) "user:F"
 6) "200"
 
-127.0.0.1:6379> ZRANGE score:220817 1 3 WITHSCORES REV
+> ZRANGE score:220817 1 3 WITHSCORES REV
 1) "user:F"
 2) "200"
 3) "user:C"
@@ -373,7 +374,7 @@ OK
 5) "user:A"
 6) "150"
 
-127.0.0.1:6379> ZRANGE score:220817 0 -1
+> ZRANGE score:220817 0 -1
 1) "user:B"
 2) "user:A"
 3) "user:C"
@@ -382,7 +383,7 @@ OK
 (integer) 4
 
 ### 스코어로 데이터 조회
-127.0.0.1:6379> ZRANGE score:220817 100 200 BYSCORE WITHSCORES
+> ZRANGE score:220817 100 200 BYSCORE WITHSCORES
 1) "user:B"
 2) "100"
 3) "user:A"
@@ -392,7 +393,7 @@ OK
 7) "user:F"
 8) "200"
 
-127.0.0.1:6379> ZRANGE score:220817 (100 200 BYSCORE WITHSCORES
+> ZRANGE score:220817 (100 200 BYSCORE WITHSCORES
 1) "user:A"
 2) "150"
 3) "user:C"
@@ -400,7 +401,7 @@ OK
 5) "user:F"
 6) "200"
 
-127.0.0.1:6379> ZRANGE score:220817 100 (200 BYSCORE WITHSCORES
+> ZRANGE score:220817 100 (200 BYSCORE WITHSCORES
 1) "user:B"
 2) "100"
 3) "user:A"
@@ -408,29 +409,29 @@ OK
 5) "user:C"
 6) "150"
 
-127.0.0.1:6379> ZRANGE score:220817 (100 (200 BYSCORE WITHSCORES
+> ZRANGE score:220817 (100 (200 BYSCORE WITHSCORES
 1) "user:A"
 2) "150"
 3) "user:C"
 4) "150"
 
 ### 사전 순으로 데이터 조회
-127.0.0.1:6379> ZADD mysortedset 0 apple 0 banana 0 candy 0 dream 0 egg 0 frog
+> ZADD mysortedset 0 apple 0 banana 0 candy 0 dream 0 egg 0 frog
 (integer) 6
 
 # stop의 문자열은 포함 안됨
-127.0.0.1:6379> ZRANGE mysortedset (b (f BYLEX
+> ZRANGE mysortedset (b (f BYLEX
 1) "banana"
 2) "candy"
 3) "dream"
 4) "egg"
 
-127.0.0.1:6379> ZRANGE mysortedset (b [e BYLEX
+> ZRANGE mysortedset (b [e BYLEX
 1) "banana"
 2) "candy"
 3) "dream"
 
-127.0.0.1:6379> ZRANGE mysortedset - + BYLEX
+> ZRANGE mysortedset - + BYLEX
 1) "apple"
 2) "banana"
 3) "candy"
@@ -441,13 +442,108 @@ OK
 
 ## Bitmaps
 
+* string 자료 구조에 bit 연산을 수행할 수 있도록 확장한 형태
+* 
 
+![](./images/data-structures-_bitmaps.svg)
+
+### 기본 명렁어
+
+* **SETBIT** - 비트를 저장
+* **GETBIT** - 비트를 조회
+* **BITFIELD** - 여러 비트를 저장
+* **BITCOUND** - 1로 설정된 비트의 개수를 카운팅
+
+```shell
+
+```
 
 ## Bitfields
 
 ## HyperLogLog
 
+* 집합의 원소 개수인 카디널리티를 추정할 수 있는 자료 구조
+* 대량의 데이터에서 중복되지 않는 고유한 값을 집계할 때 유용함
+* 입력되는 데이터를 자체적인 방법으로 변경하여 저장
+* 최대 12KB의 크기를 가짐, 하나의 hyperloglog에는 18,446,744,073,709,551,612(2^64)개의 아이템을 저장할 수 있음
+
+#### 카디널리티(Cardinality)
+
+특정 데이터 집합의 유니크(Unique)한 값의 개수를 나타낸다. 카디널리티가 낮을수록 중복요소가 더 많다는 것을 나타낸다.
+
+### 기본 명령어
+
+* PFADD - 아이템 저장
+* PFCOUND - 저장된 아이템의 개수 확인(카디널리티를 추정)
+* PFMERGE - 2개 이상의 HLL을 병합
+
+```shell
+> PFADD members 123
+(integer) 1
+
+> PFADD members 500
+(integer) 1
+
+> PFADD members 12
+(integer) 1
+
+> PFCOUNT members
+(integer) 3
+
+### PFMERGE
+> PFADD admins 4231
+(integer) 1
+
+> PFADD admins 123
+(integer) 1
+
+> PFMERGE members admins
+OK
+
+> PFCOUNT members
+(integer) 4
+```
+
 ## Geospatial indexes
+
+* 경도, 위도 데이터 쌍의 집합을 저장
+* 내부적으로 sorted set으로 저장되며, 하나의 자료 구조 안에 키는 중복돼 저장되지 않는다.
+
+### 기본 명령어
+
+* **GEOADD** - 데이터를 저장
+  * NX, XX 옵션 사용 가능
+* **GEOPOS** - 저장된 위치 데이터를 조회
+* **GEODIST** - 두 아이템 사이의 거리를 반환
+* **GEOSEARCH** - 특정 위치를 기준으로 원하는 거리 내에 있는 아이템을 검색
+
+```shell
+> GEOADD bikes:rentable -122.27652 37.805186 station:1
+(integer) 1
+
+> GEOADD bikes:rentable -122.2674626 37.8062344 station:2
+(integer) 1
+
+> GEOADD bikes:rentable -122.2469854 37.8104049 station:3
+(integer) 1
+
+> GEOPOS bikes:rentable station:2
+1) 1) "-122.2674599289894104"
+   2) "37.80623423353753054"
+
+### station1과 station2 사이의 거리를 M단위로 표시   
+> GEODIST bikes:rentable station:1 station:2 M
+"804.7392"
+
+### 반경 5KM 이내의 모든 정거장 위치를 조회
+> GEOSEARCH bikes:rentable FROMLONLAT -122.2612767 37.7936847 BYRADIUS 5 KM WITHDIST
+1) 1) "station:1"
+   2) "1.8523"
+2) 1) "station:2"
+   2) "1.4979"
+3) 1) "station:3"
+   2) "2.2441"
+```
 
 ## Streams
 
